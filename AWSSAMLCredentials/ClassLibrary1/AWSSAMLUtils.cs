@@ -226,18 +226,18 @@ namespace AWSSAML
                     {
                         if (credential.Domain != null)
                         {
-                            payloadData[input_name] = credential.Domain + "\\" + credential.UserName;
+                            payloadData[input_name] = WebUtility.UrlEncode(credential.Domain) + "\\" + WebUtility.UrlEncode(credential.UserName);
                         }
                         else
                         {
-                            payloadData[input_name] = credential.UserName;
+                            payloadData[input_name] = WebUtility.UrlEncode(credential.UserName);
                         }
                     }
                     else if (input_name.ToLower().Contains("password"))
                     {
                         // Placeholder: Add logic to let user enter OTP again
                         
-                        payloadData[input_name] = credential.Password;
+                        payloadData[input_name] = WebUtility.UrlEncode(credential.Password);
                     }
                     else
                     {
@@ -288,7 +288,15 @@ namespace AWSSAML
                     doc = new HtmlDocument();
                     doc.LoadHtml(responseStreamData);
                     rootNode = doc.DocumentNode;
-                    // map to hold the form input fields
+                    
+					// Find the error text, if there was some returned in the response
+                    HtmlNode errorNode = rootNode.SelectSingleNode(".//label[@id='errorText']");
+
+                    if(errorNode != null && errorNode.InnerText != ""){
+                        throw new ArgumentException(String.Format("Login server returned an error: {0}", errorNode.InnerText));
+                    }					
+					
+					// map to hold the form input fields
                     payloadData = new Dictionary<string, string>();
                     foreach (HtmlNode node in rootNode.Descendants("input"))
                     {
