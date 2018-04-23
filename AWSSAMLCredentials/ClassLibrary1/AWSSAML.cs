@@ -211,18 +211,19 @@ namespace AWSSAML
                 Console.WriteLine(String.Format(" [{0}]: {1} ", i, awsSamlRole[1]));
             }
 
-            Console.Write("Selection: ");
-            int roleIndex = 0;
-            ConsoleKeyInfo key;
             int index = 0;
+            String roleIndex;
+            bool result;
+
             do
             {
-                key = Console.ReadKey();
-                index = int.Parse(key.KeyChar.ToString());
-            } while (!Char.IsNumber(key.KeyChar) || index > awsSamlRoles.Length - 1);
-            Console.WriteLine();
+              Console.Write("Selection: ");
+              roleIndex = Console.ReadLine();
+              result = Int32.TryParse(roleIndex, out index);
+            } while(result == false || index < 0 || index > awsSamlRoles.Length - 1);
 
-            return awsSamlRoles[roleIndex];
+            return awsSamlRoles[index];
+
         }
 
         private string GetPasswordViaConsole()
@@ -279,7 +280,7 @@ namespace AWSSAML
             dupeTokenHandle = IntPtr.Zero;
 
             // Call LogonUser to obtain a handle to an access token.
-            // If domain joined 
+            // If domain joined
             bool returnValue = LogonUser(userName, domainName, password, LOGON32_TYPE_NEW_CREDENTIALS,
                                             LOGON32_PROVIDER_WINNT50, ref tokenHandle);
 
